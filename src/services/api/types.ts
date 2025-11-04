@@ -1,5 +1,5 @@
 // Blog Types
-export type ContentBlockType = 'paragraph' | 'header' | 'quote';
+export type ContentBlockType = "paragraph" | "header" | "quote";
 
 export interface ContentBlock {
   type: ContentBlockType;
@@ -14,6 +14,7 @@ export interface Blog {
   excerpt: string;
   thumbnail: string;
   content: ContentBlock[];
+  time_read: string;
   tag_id: number;
   created_at: string;
   updated_at: string;
@@ -26,6 +27,7 @@ export interface CreateBlogRequest {
   excerpt: string;
   thumbnail: string;
   content: ContentBlock[];
+  time_read: string;
   tag_id: number;
 }
 

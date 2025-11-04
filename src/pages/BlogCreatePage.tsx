@@ -14,11 +14,12 @@ const BlogCreatePage = () => {
 
   const [formData, setFormData] = useState({
     title: "",
-    author: "Marzuli Suhada M",
+    author: "",
     excerpt: "",
     content: [] as ContentBlock[],
     thumbnail: "",
     slug: "",
+    time_read: "",
     tag_id: 0,
   });
 
@@ -54,6 +55,14 @@ const BlogCreatePage = () => {
       alert("Please enter a blog title");
       return false;
     }
+    if (!formData.author.trim()) {
+      alert("Please enter the author name");
+      return false;
+    }
+    if (!formData.time_read.trim()) {
+      alert("Please enter the reading time");
+      return false;
+    }
     if (!formData.content || formData.content.length === 0) {
       alert("Please add content to your blog");
       return false;
@@ -76,6 +85,7 @@ const BlogCreatePage = () => {
         excerpt: formData.excerpt,
         thumbnail: formData.thumbnail,
         content: formData.content,
+        time_read: formData.time_read,
         tag_id: formData.tag_id,
       });
       alert("Draft saved successfully!");
@@ -96,6 +106,7 @@ const BlogCreatePage = () => {
         excerpt: formData.excerpt,
         thumbnail: formData.thumbnail,
         content: formData.content,
+        time_read: formData.time_read,
         tag_id: formData.tag_id,
       });
       alert("Blog created successfully!");
@@ -135,6 +146,30 @@ const BlogCreatePage = () => {
                 Slug: <span className="font-mono">{formData.slug}</span>
               </p>
             )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Author</label>
+              <input
+                type="text"
+                value={formData.author}
+                onChange={(e) => setFormData((prev) => ({ ...prev, author: e.target.value }))}
+                placeholder="Enter author name"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Reading Time</label>
+              <input
+                type="text"
+                value={formData.time_read}
+                onChange={(e) => setFormData((prev) => ({ ...prev, time_read: e.target.value }))}
+                placeholder="e.g., 5 min read"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div>
