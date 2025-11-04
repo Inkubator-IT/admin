@@ -1,4 +1,11 @@
 // Blog Types
+export type ContentBlockType = 'paragraph' | 'header' | 'quote';
+
+export interface ContentBlock {
+  type: ContentBlockType;
+  text: string;
+}
+
 export interface Blog {
   id: number;
   title: string;
@@ -6,7 +13,7 @@ export interface Blog {
   slug: string;
   excerpt: string;
   thumbnail: string;
-  content: string;
+  content: ContentBlock[];
   tag_id: number;
   created_at: string;
   updated_at: string;
@@ -18,7 +25,7 @@ export interface CreateBlogRequest {
   slug: string;
   excerpt: string;
   thumbnail: string;
-  content: string;
+  content: ContentBlock[];
   tag_id: number;
 }
 

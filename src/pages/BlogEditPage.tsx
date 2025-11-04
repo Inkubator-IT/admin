@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import RichTextEditor from "@/components/editor/RichTextEditor";
+import StructuredContentEditor from "@/components/editor/StructuredContentEditor";
 import TagDropdown from "@/components/ui/TagDropdown";
 import MetaTags from "@/components/MetaTags";
 import { useBlog, useUpdateBlog } from "@/hooks/useBlogs";
 import { useTags } from "@/hooks/useTags";
+import type { ContentBlock } from "@/services/api/types";
 
 const BlogEditPage = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const BlogEditPage = () => {
     title: "",
     author: "",
     excerpt: "",
-    content: "",
+    content: [] as ContentBlock[],
     thumbnail: "",
     slug: "",
     tag_id: 0,
@@ -66,10 +67,8 @@ const BlogEditPage = () => {
     }));
   };
 
-  const handleContentChange = (content: any) => {
-    // Convert Tiptap JSON to HTML string for API
-    const contentString = JSON.stringify(content);
-    setFormData((prev) => ({ ...prev, content: contentString }));
+  const handleContentChange = (content: ContentBlock[]) => {
+    setFormData((prev) => ({ ...prev, content }));
   };
 
   const handleTagChange = (tagIds: number[]) => {
@@ -82,7 +81,7 @@ const BlogEditPage = () => {
       alert("Please enter a blog title");
       return false;
     }
-    if (!formData.content) {
+    if (!formData.content || formData.content.length === 0) {
       alert("Please add content to your blog");
       return false;
     }
@@ -190,11 +189,7 @@ const BlogEditPage = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-              <RichTextEditor
-                content={formData.content ? JSON.parse(formData.content) : null}
-                onChange={handleContentChange}
-                placeholder="Start writing your blog content..."
-              />
+              <StructuredContentEditor content={formData.content} onChange={handleContentChange} />
             </div>
 
             <div>
