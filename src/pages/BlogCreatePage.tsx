@@ -161,7 +161,7 @@ const BlogCreatePage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Reading Time</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Reading Time (minutes)</label>
               <input
                 type="text"
                 value={formData.time_read}
