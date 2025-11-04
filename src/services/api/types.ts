@@ -16,6 +16,11 @@ export interface Blog {
   content: ContentBlock[];
   time_read: string;
   tag_id: number;
+  tag?: {
+    tag_id: number;
+    tag_name: string;
+    tag_description: string;
+  };
   created_at: string;
   updated_at: string;
 }
