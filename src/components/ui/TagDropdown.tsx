@@ -77,26 +77,30 @@ const TagDropdown = ({ tags, selectedTagIds, onTagChange, placeholder = "Select 
 			</div>
 
 			{isOpen && (
-				<div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-					{tags.map(tag => (
+			<div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+				{tags.length === 0 ? (
+				<div className="px-3 py-2 text-sm text-gray-500">No tags available</div>
+				) : (
+				tags.map(tag => (
+					<div
+					key={tag.id}
+					onClick={() => handleTagToggle(tag.id)}
+					className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer"
+					>
+					<div className="flex items-center gap-2">
 						<div
-							key={tag.id}
-							onClick={() => handleTagToggle(tag.id)}
-							className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer"
-						>
-							<div className="flex items-center gap-2">
-								<div
-									className="w-3 h-3 rounded-full"
-									style={{ backgroundColor: tag.color }}
-								/>
-								<span className="text-sm text-gray-900">{tag.name}</span>
-							</div>
-							{selectedTagIds.includes(tag.id) && (
-								<Check className="w-4 h-4 text-blue-600" />
-							)}
-						</div>
-					))}
-				</div>
+						className="w-3 h-3 rounded-full"
+						style={{ backgroundColor: tag.color }}
+						/>
+						<span className="text-sm text-gray-900">{tag.name}</span>
+					</div>
+					{selectedTagIds.includes(tag.id) && (
+						<Check className="w-4 h-4 text-blue-600" />
+					)}
+					</div>
+				))
+				)}
+			</div>
 			)}
 		</div>
 	);
