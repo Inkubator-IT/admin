@@ -20,12 +20,14 @@ import {
 	Link as LinkIcon,
 	Heading1,
 	Heading2,
-	Heading3
+	Heading3,
+	Quote
 } from "lucide-react";
+import type { TipTapJSON } from "@/services/api";
 
 interface RichTextEditorProps {
-	content?: any;
-	onChange?: (content: any) => void;
+	content?: TipTapJSON | null;
+	onChange?: (content: TipTapJSON) => void;
 	placeholder?: string;
 }
 
@@ -55,7 +57,8 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 		],
 		content: content || "",
 		onUpdate: ({ editor }) => {
-			onChange?.(editor.getJSON());
+			const json = editor.getJSON();
+			onChange?.(json as TipTapJSON);
 		},
 		editorProps: {
 			attributes: {
@@ -108,7 +111,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 				<div className="flex flex-wrap gap-1">
 					<button
 						onClick={() => editor.chain().focus().toggleBold().run()}
-						className={`p-1 rounded ${editor.isActive("bold") ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("bold") ? "bg-gray-200" : ""}`}
 						title="Bold"
 					>
 						<Bold className="w-4 h-4" />
@@ -116,7 +119,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleItalic().run()}
-						className={`p-1 rounded ${editor.isActive("italic") ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("italic") ? "bg-gray-200" : ""}`}
 						title="Italic"
 					>
 						<Italic className="w-4 h-4" />
@@ -124,7 +127,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleUnderline().run()}
-						className={`p-1 rounded ${editor.isActive("underline") ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("underline") ? "bg-gray-200" : ""}`}
 						title="Underline"
 					>
 						<Underline className="w-4 h-4" />
@@ -132,7 +135,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleStrike().run()}
-						className={`p-1 rounded ${editor.isActive("strike") ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("strike") ? "bg-gray-200" : ""}`}
 						title="Strikethrough"
 					>
 						<Strikethrough className="w-4 h-4" />
@@ -142,7 +145,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-						className={`p-1 rounded ${editor.isActive("heading", { level: 1 }) ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 1 }) ? "bg-gray-200" : ""}`}
 						title="Heading 1"
 					>
 						<Heading1 className="w-4 h-4" />
@@ -158,17 +161,25 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-						className={`p-1 rounded ${editor.isActive("heading", { level: 3 }) ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 3 }) ? "bg-gray-200" : ""}`}
 						title="Heading 3"
 					>
 						<Heading3 className="w-4 h-4" />
+					</button>
+
+					<button
+						onClick={() => editor.chain().focus().toggleBlockquote().run()}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("blockquote") ? "bg-gray-200" : ""}`}
+						title="Quote"
+					>
+						<Quote className="w-4 h-4" />
 					</button>
 
 					<div className="w-px h-6 bg-gray-300 mx-1" />
 
 					<button
 						onClick={() => editor.chain().focus().setTextAlign("left").run()}
-						className={`p-1 rounded ${editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""}`}
 						title="Align Left"
 					>
 						<AlignLeft className="w-4 h-4" />
@@ -176,7 +187,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().setTextAlign("center").run()}
-						className={`p-1 rounded ${editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""}`}
 						title="Align Center"
 					>
 						<AlignCenter className="w-4 h-4" />
@@ -184,7 +195,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().setTextAlign("right").run()}
-						className={`p-1 rounded ${editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""}`}
 						title="Align Right"
 					>
 						<AlignRight className="w-4 h-4" />
@@ -192,7 +203,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-						className={`p-1 rounded ${editor.isActive({ textAlign: "justify" }) ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive({ textAlign: "justify" }) ? "bg-gray-200" : ""}`}
 						title="Justify"
 					>
 						<AlignJustify className="w-4 h-4" />
@@ -202,7 +213,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleBulletList().run()}
-						className={`p-1 rounded ${editor.isActive("bulletList") ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("bulletList") ? "bg-gray-200" : ""}`}
 						title="Bullet List"
 					>
 						<List className="w-4 h-4" />
@@ -210,7 +221,7 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={() => editor.chain().focus().toggleOrderedList().run()}
-						className={`p-1 rounded ${editor.isActive("orderedList") ? "bg-gray-200" : ""}`}
+						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("orderedList") ? "bg-gray-200" : ""}`}
 						title="Numbered List"
 					>
 						<ListOrdered className="w-4 h-4" />
