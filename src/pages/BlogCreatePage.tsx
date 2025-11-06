@@ -1,27 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import StructuredContentEditor from "@/components/editor/StructuredContentEditor";
+import RichTextEditor from "@/components/editor/RichTextEditor";
 import TagDropdown from "@/components/ui/TagDropdown";
 import MetaTags from "@/components/MetaTags";
 import { useCreateBlog } from "@/hooks/useBlogs";
 import { useTags } from "@/hooks/useTags";
-import type { ContentBlock } from "@/services/api/types";
+import type { TipTapJSON } from "@/services/api";
 
 const BlogCreatePage = () => {
   const navigate = useNavigate();
-  const { data: tags = [], isLoading: tagsLoading } = useTags();
+  const { data: tags = [], isLoading: tagsLoading, error: tagsError, isError: tagsIsError } = useTags();
   const createBlogMutation = useCreateBlog();
 
   const [formData, setFormData] = useState({
     title: "",
     author: "",
     excerpt: "",
-    content: [] as ContentBlock[],
+    content: undefined as TipTapJSON | undefined,
     thumbnail: "",
     slug: "",
     time_read: "",
     tag_id: 0,
   });
+
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   // Generate slug from title
   const generateSlug = (title: string) => {
@@ -41,13 +43,38 @@ const BlogCreatePage = () => {
     }));
   };
 
-  const handleContentChange = (content: ContentBlock[]) => {
+  const handleContentChange = (content: TipTapJSON) => {
     setFormData((prev) => ({ ...prev, content }));
   };
 
   const handleTagChange = (tagIds: number[]) => {
-    // Since API expects single tag_id, take the first one
     setFormData((prev) => ({ ...prev, tag_id: tagIds[0] || 0 }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setFormData((prev) => ({ ...prev, thumbnail: base64String }));
+      setImagePreview(base64String);
+    };
+    reader.onerror = () => {
+      alert("Failed to read image file");
+    };
+    reader.readAsDataURL(file);
   };
 
   const validateForm = () => {
@@ -63,8 +90,12 @@ const BlogCreatePage = () => {
       alert("Please enter the reading time");
       return false;
     }
-    if (!formData.content || formData.content.length === 0) {
+    if (!formData.content || !formData.content.content || formData.content.content.length === 0) {
       alert("Please add content to your blog");
+      return false;
+    }
+    if (!formData.thumbnail) {
+      alert("Please upload a thumbnail image");
       return false;
     }
     if (!formData.tag_id) {
@@ -84,7 +115,7 @@ const BlogCreatePage = () => {
         slug: formData.slug,
         excerpt: formData.excerpt,
         thumbnail: formData.thumbnail,
-        content: formData.content,
+        content: formData.content!,
         time_read: formData.time_read,
         tag_id: formData.tag_id,
       });
@@ -105,7 +136,7 @@ const BlogCreatePage = () => {
         slug: formData.slug,
         excerpt: formData.excerpt,
         thumbnail: formData.thumbnail,
-        content: formData.content,
+        content: formData.content!,
         time_read: formData.time_read,
         tag_id: formData.tag_id,
       });
@@ -166,7 +197,7 @@ const BlogCreatePage = () => {
                 type="text"
                 value={formData.time_read}
                 onChange={(e) => setFormData((prev) => ({ ...prev, time_read: e.target.value }))}
-                placeholder="e.g., 5 min read"
+                placeholder="Input a number of minutes..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -184,12 +215,40 @@ const BlogCreatePage = () => {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Thumbnail Image
+            </label>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleImageChange}
+              className='w-full px-3 py-2 border border-gray-300'
+            />
+            {imagePreview && (
+              <div className='mt-4'>
+                <p className='text-sm text-gray-600 mb-2'>Preview</p>
+                <img src={imagePreview} alt="Thumbnail Preview" className='max-w-full h-auto max-h-64 rounded-lg border border-gray-300' />
+              </div>  
+            )}
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-            <StructuredContentEditor content={formData.content} onChange={handleContentChange} />
+            <RichTextEditor content={formData.content} onChange={handleContentChange} placeholder="Start writing your blog content..." />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Select Tag</label>
+            {tagsIsError && (
+              <div className="mb-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-600">
+                Error loading tags: {tagsError instanceof Error ? tagsError.message : "Unknown error"}
+                <br />
+                <span className="text-xs">Check console and ensure API server is running on port 3000</span>
+              </div>
+            )}
+            {tagsLoading && (
+              <div className="mb-2 text-sm text-gray-500">Loading tags...</div>
+            )}
             <TagDropdown
               tags={tags.map((tag) => ({
                 id: tag.tag_id,

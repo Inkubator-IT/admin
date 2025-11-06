@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import StructuredContentEditor from "@/components/editor/StructuredContentEditor";
+import RichTextEditor from "@/components/editor/RichTextEditor";
 import TagDropdown from "@/components/ui/TagDropdown";
 import MetaTags from "@/components/MetaTags";
 import { useBlog, useUpdateBlog } from "@/hooks/useBlogs";
 import { useTags } from "@/hooks/useTags";
-import type { ContentBlock } from "@/services/api/types";
+import type { TipTapJSON } from "@/services/api/types";
 
 const BlogEditPage = () => {
   const navigate = useNavigate();
@@ -20,16 +20,37 @@ const BlogEditPage = () => {
     title: "",
     author: "",
     excerpt: "",
-    content: [] as ContentBlock[],
+    content: undefined as TipTapJSON | undefined,
     thumbnail: "",
     slug: "",
     time_read: "",
     tag_id: 0,
   });
 
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hasLoadedFromCacheRef = useRef(false);
+
+  // Load from cache on mount
+  useEffect(() => {
+    if (!blogId) return;
+    
+    try {
+      const cached = localStorage.getItem(`blog-edit-cache-${blogId}`);
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setFormData(parsed.formData);
+        setImagePreview(parsed.imagePreview || "");
+        hasLoadedFromCacheRef.current = true;
+      }
+    } catch (error) {
+      console.error("Error loading cache:", error);
+    }
+  }, [blogId]);
+
   // Update form data when blog is loaded
   useEffect(() => {
-    if (blog) {
+    if (blog && !hasLoadedFromCacheRef.current) {
       setFormData({
         title: blog.title,
         author: blog.author,
@@ -40,8 +61,31 @@ const BlogEditPage = () => {
         time_read: blog.time_read || "",
         tag_id: blog.tag_id,
       });
+      setImagePreview(blog.thumbnail || "");
     }
   }, [blog]);
+
+  // Save to cache whenever formData or imagePreview changes
+  useEffect(() => {
+    if (!blogId) return; 
+
+    if (!hasLoadedFromCacheRef.current && !blog) return;
+    
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(
+          `blog-edit-cache-${blogId}`,
+          JSON.stringify({ formData, imagePreview })
+        );
+      } catch (error) {
+        console.error("Error saving cache:", error);
+      }
+    }, 500);
+  }, [formData, imagePreview, blogId, blog]);
 
   // Handle blog load error
   useEffect(() => {
@@ -50,6 +94,15 @@ const BlogEditPage = () => {
       navigate("/blogs");
     }
   }, [blogError, navigate]);
+
+  // Clear cache on unmount if save was successful
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Generate slug from title
   const generateSlug = (title: string) => {
@@ -69,13 +122,41 @@ const BlogEditPage = () => {
     }));
   };
 
-  const handleContentChange = (content: ContentBlock[]) => {
+  const handleContentChange = (content: TipTapJSON) => {
     setFormData((prev) => ({ ...prev, content }));
   };
 
   const handleTagChange = (tagIds: number[]) => {
-    // Since API expects single tag_id, take the first one
     setFormData((prev) => ({ ...prev, tag_id: tagIds[0] || 0 }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size should be less than 5MB");
+      return;
+    }
+
+    // Convert to base64
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setFormData((prev) => ({ ...prev, thumbnail: base64String }));
+      setImagePreview(base64String);
+    };
+    reader.onerror = () => {
+      alert("Failed to read image file");
+    };
+    reader.readAsDataURL(file);
   };
 
   const validateForm = () => {
@@ -91,7 +172,7 @@ const BlogEditPage = () => {
       alert("Please enter the reading time");
       return false;
     }
-    if (!formData.content || formData.content.length === 0) {
+    if (!formData.content || !formData.content.content || formData.content.content.length === 0) {
       alert("Please add content to your blog");
       return false;
     }
@@ -119,6 +200,10 @@ const BlogEditPage = () => {
           tag_id: formData.tag_id,
         },
       });
+      // Clear cache on successful save
+      if (blogId) {
+        localStorage.removeItem(`blog-edit-cache-${blogId}`);
+      }
       alert("Draft saved successfully!");
       navigate("/blogs");
     } catch (error) {
@@ -143,6 +228,10 @@ const BlogEditPage = () => {
           tag_id: formData.tag_id,
         },
       });
+      // Clear cache on successful update
+      if (blogId) {
+        localStorage.removeItem(`blog-edit-cache-${blogId}`);
+      }
       alert("Blog updated successfully!");
       navigate("/blogs");
     } catch (error) {
@@ -179,7 +268,7 @@ const BlogEditPage = () => {
                 value={formData.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Enter blog title"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
               />
               {formData.slug && (
                 <p className="mt-1 text-sm text-gray-500">
@@ -196,7 +285,7 @@ const BlogEditPage = () => {
                   value={formData.author}
                   onChange={(e) => setFormData((prev) => ({ ...prev, author: e.target.value }))}
                   placeholder="Enter author name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
                 />
               </div>
 
@@ -206,8 +295,8 @@ const BlogEditPage = () => {
                   type="text"
                   value={formData.time_read}
                   onChange={(e) => setFormData((prev) => ({ ...prev, time_read: e.target.value }))}
-                  placeholder="e.g., 5 min read"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Input a number of minutes..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
                 />
               </div>
             </div>
@@ -219,13 +308,39 @@ const BlogEditPage = () => {
                 onChange={(e) => setFormData((prev) => ({ ...prev, excerpt: e.target.value }))}
                 placeholder="Brief description of your blog..."
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
               />
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Thumbnail Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+              />
+              {imagePreview && (
+                <div className="mt-4">
+                  <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                  <img
+                    src={imagePreview}
+                    alt="Thumbnail preview"
+                    className="max-w-full h-auto max-h-64 rounded-lg border border-gray-300"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-              <StructuredContentEditor content={formData.content} onChange={handleContentChange} />
+              <RichTextEditor 
+                content={formData.content}
+                onChange={handleContentChange}
+                placeholder="Start writing your blog content..."
+              />
             </div>
 
             <div>
