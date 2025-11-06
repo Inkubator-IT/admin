@@ -1,10 +1,15 @@
-// Blog Types
-export type ContentBlockType = "paragraph" | "header" | "quote";
-
-export interface ContentBlock {
-  type: ContentBlockType;
-  text: string;
+export interface TipTapJSON {
+  type: "doc";
+  content: Array<any>;
 }
+
+// // Blog Types
+// export type ContentBlockType = "paragraph" | "header" | "quote";
+
+// export interface ContentBlock {
+//   type: ContentBlockType;
+//   text: string;
+// }
 
 export interface Blog {
   id: number;
@@ -13,7 +18,7 @@ export interface Blog {
   slug: string;
   excerpt: string;
   thumbnail: string;
-  content: ContentBlock[];
+  content: TipTapJSON;
   time_read: string;
   tag_id: number;
   tag?: {
@@ -31,7 +36,7 @@ export interface CreateBlogRequest {
   slug: string;
   excerpt: string;
   thumbnail: string;
-  content: ContentBlock[];
+  content: TipTapJSON;
   time_read: string;
   tag_id: number;
 }
