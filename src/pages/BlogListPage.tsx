@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, ThumbsUp } from "lucide-react";
 import { formatDate } from "@/utils/dateUtils";
 import MetaTags from "@/components/MetaTags";
 import { useBlogs, useDeleteBlog } from "@/hooks/useBlogs";
@@ -165,6 +165,10 @@ const BlogListPage = () => {
                             {/* <button className="text-gray-400 hover:text-gray-600 transition-colors">
                               <Eye className="w-4 h-4" />
                             </button> */}
+                            <span className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600">
+                              <ThumbsUp className="w-4 h-auto"/>
+                              {blog.like_count ?? 0}
+                            </span>
                             <Link
                               to={`/blogs/${blog.id}/edit`}
                               className="text-gray-400 hover:text-gray-600 transition-colors"

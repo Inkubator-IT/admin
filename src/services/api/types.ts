@@ -20,6 +20,7 @@ export interface Blog {
   thumbnail: string;
   content: TipTapJSON;
   time_read: string;
+  like_count?: number;
   tag_id: number;
   tag?: {
     tag_id: number;
