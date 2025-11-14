@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"build": "bunx tsc -b && vite build",
 		"lint": "bunx biome lint",
 		"lint:fix": "bunx biome lint --write",
 		"format": "bunx biome format --write",
