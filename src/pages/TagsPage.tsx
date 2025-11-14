@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 import MetaTags from "@/components/MetaTags";
-import { useTags, useCreateTag, useUpdateTag, useDeleteTag } from "@/hooks/useTags";
+import {
+	useTags,
+	useCreateTag,
+	useUpdateTag,
+	useDeleteTag,
+} from "@/hooks/useTags";
 import type { Tag as ApiTag } from "@/services/api/types";
+import { sanitizeTagName, sanitizeTagDescription } from "@/utils/sanitizeInput";
 
 const TagsPage = () => {
 	const [newTagName, setNewTagName] = useState("");
@@ -25,8 +31,8 @@ const TagsPage = () => {
 
 		try {
 			await createTagMutation.mutateAsync({
-				tag_name: newTagName.trim(),
-				tag_description: newTagDescription.trim() || "",
+				tag_name: sanitizeTagName(newTagName),
+				tag_description: sanitizeTagDescription(newTagDescription) || "",
 			});
 			setNewTagName("");
 			setNewTagDescription("");
@@ -52,8 +58,8 @@ const TagsPage = () => {
 			await updateTagMutation.mutateAsync({
 				id: editingTag.tag_id,
 				data: {
-					tag_name: editTagName.trim(),
-					tag_description: editTagDescription.trim() || "",
+					tag_name: sanitizeTagName(editTagName),
+					tag_description: sanitizeTagDescription(editTagDescription) || "",
 				},
 			});
 			setEditingTag(null);
@@ -94,7 +100,7 @@ const TagsPage = () => {
 
 	return (
 		<div className="p-8">
-			<MetaTags 
+			<MetaTags
 				title="Kelola Tags - Admin Dashboard Inkubator IT"
 				description="Kelola kategori dan tags untuk blog website Inkubator IT"
 				keywords="tag management, kategori blog, content organization, inkubator it, admin"
@@ -106,13 +112,16 @@ const TagsPage = () => {
 
 			{error && (
 				<div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
-					Error loading tags: {error instanceof Error ? error.message : "Unknown error"}
+					Error loading tags:{" "}
+					{error instanceof Error ? error.message : "Unknown error"}
 				</div>
 			)}
 
 			<div className="w-full space-y-8">
 				<div className="bg-white rounded-lg shadow-sm border p-6">
-					<h2 className="text-xl font-semibold text-gray-900 mb-4">Add New Tags</h2>
+					<h2 className="text-xl font-semibold text-gray-900 mb-4">
+						Add New Tags
+					</h2>
 					<div className="space-y-4">
 						<div className="flex-1 relative">
 							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -148,7 +157,9 @@ const TagsPage = () => {
 
 				<div className="bg-white rounded-lg shadow-sm border">
 					<div className="p-6 border-b border-gray-200">
-						<h2 className="text-xl font-semibold text-gray-900">Existing Tags</h2>
+						<h2 className="text-xl font-semibold text-gray-900">
+							Existing Tags
+						</h2>
 					</div>
 					<div className="overflow-x-auto">
 						<table className="w-full">
@@ -168,7 +179,10 @@ const TagsPage = () => {
 							<tbody className="bg-white divide-y divide-gray-200">
 								{tags.length === 0 ? (
 									<tr>
-										<td colSpan={3} className="px-6 py-8 text-center text-gray-500">
+										<td
+											colSpan={3}
+											className="px-6 py-8 text-center text-gray-500"
+										>
 											No tags available. Create your first tag above.
 										</td>
 									</tr>
@@ -182,7 +196,9 @@ const TagsPage = () => {
 														value={editTagName}
 														onChange={(e) => setEditTagName(e.target.value)}
 														className="px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-														onKeyPress={(e) => e.key === "Enter" && handleUpdateTag()}
+														onKeyPress={(e) =>
+															e.key === "Enter" && handleUpdateTag()
+														}
 														autoFocus
 													/>
 												) : (
@@ -196,7 +212,9 @@ const TagsPage = () => {
 													<input
 														type="text"
 														value={editTagDescription}
-														onChange={(e) => setEditTagDescription(e.target.value)}
+														onChange={(e) =>
+															setEditTagDescription(e.target.value)
+														}
 														className="px-2 py-1 w-full border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 													/>
 												) : (
@@ -213,7 +231,9 @@ const TagsPage = () => {
 															disabled={updateTagMutation.isPending}
 															className="text-green-600 hover:text-green-800 transition-colors disabled:opacity-50"
 														>
-															{updateTagMutation.isPending ? "Saving..." : "Save"}
+															{updateTagMutation.isPending
+																? "Saving..."
+																: "Save"}
 														</button>
 														<button
 															onClick={handleCancelEdit}
@@ -237,7 +257,9 @@ const TagsPage = () => {
 															className="flex items-center gap-1 text-red-600 hover:text-red-800 transition-colors disabled:opacity-50"
 														>
 															<Trash2 className="w-4 h-4" />
-															{deleteTagMutation.isPending ? "Deleting..." : "Delete"}
+															{deleteTagMutation.isPending
+																? "Deleting..."
+																: "Delete"}
 														</button>
 													</div>
 												)}
