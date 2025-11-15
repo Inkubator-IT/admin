@@ -44,9 +44,11 @@ const BlogEditPage = () => {
 			const cached = localStorage.getItem(`blog-edit-cache-${blogId}`);
 			if (cached) {
 				const parsed = JSON.parse(cached);
-				setFormData(parsed.formData);
-				setImagePreview(parsed.imagePreview || "");
-				hasLoadedFromCacheRef.current = true;
+				if (parsed.formData?.content?.content?.length > 0) {
+					setFormData(parsed.formData);
+					setImagePreview(parsed.imagePreview || "");
+					hasLoadedFromCacheRef.current = true;
+				}
 			}
 		} catch (error) {
 			console.error("Error loading cache:", error);
