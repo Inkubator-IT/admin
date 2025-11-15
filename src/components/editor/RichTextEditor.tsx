@@ -1,5 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -66,6 +66,15 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 			},
 		},
 	});
+
+	useEffect(() => {
+		if (editor && content) {
+			const currentContent = editor.getJSON();
+			if (JSON.stringify(currentContent) !== JSON.stringify(content)) {
+				editor.commands.setContent(content);
+			}
+		}
+	}, [editor, content]);
 
 	const addImage = () => {
 		fileInputRef.current?.click();
