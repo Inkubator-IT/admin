@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
-import { FileText, Tag, Settings } from "lucide-react";
+import { FileText, Tag, Settings, Briefcase, Layers } from "lucide-react";
 
 const AdminLayout = () => {
 	return (
@@ -30,6 +30,36 @@ const AdminLayout = () => {
 							>
 								<FileText className="w-4 h-4" />
 								Blogs
+							</NavLink>
+						</li>
+						<li>
+							<NavLink
+								to="/projects"
+								className={({ isActive }) =>
+									`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+										isActive
+											? "bg-purple-100 text-purple-700"
+											: "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+									}`
+								}
+							>
+								<Briefcase className="w-4 h-4" />
+								Projects
+							</NavLink>
+						</li>
+						<li>
+							<NavLink
+								to="/tech-stack"
+								className={({ isActive }) =>
+									`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+										isActive
+											? "bg-purple-100 text-purple-700"
+											: "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+									}`
+								}
+							>
+								<Layers className="w-4 h-4" />
+								Tech Stack
 							</NavLink>
 						</li>
 						<li>

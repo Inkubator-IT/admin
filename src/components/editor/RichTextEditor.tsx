@@ -24,7 +24,7 @@ import {
 	Quote,
 } from "lucide-react";
 import type { TipTapJSON } from "@/services/api";
-import { getImageUrl, uploadImage } from "@/utils/imageUpload";
+import { uploadImage } from "@/utils/imageUpload";
 
 interface RichTextEditorProps {
 	content?: TipTapJSON | null;
@@ -93,15 +93,10 @@ const RichTextEditor = ({
 		if (file && file.type.startsWith("image/")) {
 			setIsUploadingImage(true);
 			try {
-				// Upload to S3 and get the key
-				const key = await uploadImage(file);
-
-				// Get presigned URL for displaying the image
-				const imageUrl = await getImageUrl(key);
+				// Upload to storage and get the public URL
+				const { url: imageUrl } = await uploadImage(file);
 
 				// Insert image with presigned URL
-				// Note: In production, you might want to store the key in a custom attribute
-				// and fetch fresh presigned URLs when loading content
 				editor?.chain().focus().setImage({ src: imageUrl }).run();
 			} catch (error) {
 				alert(

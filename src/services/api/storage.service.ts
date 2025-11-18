@@ -4,10 +4,16 @@ const API_BASE_URL =
 export interface PresignUploadResponse {
 	url: string;
 	key: string;
+	publicUrl: string;
 	contentType: string;
 }
 
 export interface PresignDownloadResponse {
+	url: string;
+}
+
+export interface UploadedImage {
+	key: string;
 	url: string;
 }
 
@@ -56,7 +62,15 @@ export class StorageService {
 	/**
 	 * Get a presigned URL for downloading/viewing a file
 	 */
+	static isPublicUrl(value: string | null | undefined) {
+		return !!value && /^https?:\/\//i.test(value);
+	}
+
 	static async getDownloadUrl(key: string): Promise<PresignDownloadResponse> {
+		if (this.isPublicUrl(key)) {
+			return { url: key };
+		}
+
 		const response = await fetch(
 			`${API_BASE_URL}/api/storage?key=${encodeURIComponent(key)}`,
 		);
@@ -73,7 +87,7 @@ export class StorageService {
 	 * Complete upload flow: get presigned URL and upload file
 	 * Returns the S3 key that should be stored in the database
 	 */
-	static async uploadImage(file: File): Promise<string> {
+	static async uploadImage(file: File): Promise<UploadedImage> {
 		// Validate file
 		if (!file.type.startsWith("image/")) {
 			throw new Error("Please select a valid image file");
@@ -84,12 +98,13 @@ export class StorageService {
 		}
 
 		// Get presigned URL
-		const { url, key, contentType } = await this.getUploadUrl(file.name);
+		const { url, key, publicUrl, contentType } = await this.getUploadUrl(
+			file.name,
+		);
 
 		// Upload file to S3
 		await this.uploadFile(url, file, contentType);
 
-		// Return the key to store in database
-		return key;
+		return { key, url: publicUrl };
 	}
 }

@@ -75,10 +75,10 @@ const BlogCreatePage = () => {
 
 		setIsUploadingImage(true);
 		try {
-			// Upload to S3 and get the key and preview URL
-			const { key, previewUrl } = await handleImageUpload(file);
-			setFormData((prev) => ({ ...prev, thumbnail: key }));
-			setImagePreview(previewUrl);
+			// Upload image and get the public URL
+			const { url } = await handleImageUpload(file);
+			setFormData((prev) => ({ ...prev, thumbnail: url }));
+			setImagePreview(url);
 		} catch (error) {
 			alert(error instanceof Error ? error.message : "Failed to upload image");
 		} finally {
