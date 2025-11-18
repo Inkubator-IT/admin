@@ -1,5 +1,5 @@
 import { useEditor, EditorContent } from "@tiptap/react";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
@@ -21,9 +21,10 @@ import {
 	Heading1,
 	Heading2,
 	Heading3,
-	Quote
+	Quote,
 } from "lucide-react";
 import type { TipTapJSON } from "@/services/api";
+import { getImageUrl, uploadImage } from "@/utils/imageUpload";
 
 interface RichTextEditorProps {
 	content?: TipTapJSON | null;
@@ -31,8 +32,13 @@ interface RichTextEditorProps {
 	placeholder?: string;
 }
 
-const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }: RichTextEditorProps) => {
+const RichTextEditor = ({
+	content,
+	onChange,
+	placeholder = "Start writing...",
+}: RichTextEditorProps) => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [isUploadingImage, setIsUploadingImage] = useState(false);
 
 	const editor = useEditor({
 		extensions: [
@@ -80,19 +86,34 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 		fileInputRef.current?.click();
 	};
 
-	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleFileUpload = async (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
 		const file = event.target.files?.[0];
-		if (file && file.type.startsWith('image/')) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				const imageUrl = e.target?.result as string;
+		if (file && file.type.startsWith("image/")) {
+			setIsUploadingImage(true);
+			try {
+				// Upload to S3 and get the key
+				const key = await uploadImage(file);
+
+				// Get presigned URL for displaying the image
+				const imageUrl = await getImageUrl(key);
+
+				// Insert image with presigned URL
+				// Note: In production, you might want to store the key in a custom attribute
+				// and fetch fresh presigned URLs when loading content
 				editor?.chain().focus().setImage({ src: imageUrl }).run();
-			};
-			reader.readAsDataURL(file);
+			} catch (error) {
+				alert(
+					error instanceof Error ? error.message : "Failed to upload image",
+				);
+			} finally {
+				setIsUploadingImage(false);
+			}
 		}
-		// Reset input file agar bisa upload file yang sama lagi
+		// Reset input file so the same file can be uploaded again
 		if (fileInputRef.current) {
-			fileInputRef.current.value = '';
+			fileInputRef.current.value = "";
 		}
 	};
 
@@ -153,7 +174,9 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 					<div className="w-px h-6 bg-gray-300 mx-1" />
 
 					<button
-						onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+						onClick={() =>
+							editor.chain().focus().toggleHeading({ level: 1 }).run()
+						}
 						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 1 }) ? "bg-gray-200" : ""}`}
 						title="Heading 1"
 					>
@@ -161,7 +184,9 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 					</button>
 
 					<button
-						onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+						onClick={() =>
+							editor.chain().focus().toggleHeading({ level: 2 }).run()
+						}
 						className={`p-1 rounded ${editor.isActive("heading", { level: 2 }) ? "bg-gray-200" : ""}`}
 						title="Heading 2"
 					>
@@ -169,7 +194,9 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 					</button>
 
 					<button
-						onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+						onClick={() =>
+							editor.chain().focus().toggleHeading({ level: 3 }).run()
+						}
 						className={`p-1 rounded hover:bg-gray-200 ${editor.isActive("heading", { level: 3 }) ? "bg-gray-200" : ""}`}
 						title="Heading 3"
 					>
@@ -240,11 +267,15 @@ const RichTextEditor = ({ content, onChange, placeholder = "Start writing..." }:
 
 					<button
 						onClick={addImage}
-						className="p-1 rounded hover:bg-gray-200"
-						title="Insert Image"
+						disabled={isUploadingImage}
+						className={`p-1 rounded hover:bg-gray-200 ${isUploadingImage ? "opacity-50 cursor-not-allowed" : ""}`}
+						title={isUploadingImage ? "Uploading..." : "Insert Image"}
 					>
 						<ImageIcon className="w-4 h-4" />
 					</button>
+					{isUploadingImage && (
+						<span className="text-xs text-blue-600 ml-2">Uploading...</span>
+					)}
 
 					<button
 						onClick={addLink}

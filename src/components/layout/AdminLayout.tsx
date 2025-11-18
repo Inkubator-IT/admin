@@ -7,10 +7,14 @@ const AdminLayout = () => {
 			<aside className="w-64 bg-white shadow-sm border-r h-screen flex flex-col">
 				<div className="p-6">
 					<div className="w-full">
-						<img src="/iit-logo.png" alt="Inkubator IT" className="w-full h-auto object-contain" />
+						<img
+							src="/iit-logo.png"
+							alt="Inkubator IT"
+							className="w-full h-auto object-contain"
+						/>
 					</div>
 				</div>
-				
+
 				<nav className="px-4 pb-4 flex-1">
 					<ul className="space-y-2">
 						<li>
@@ -61,7 +65,7 @@ const AdminLayout = () => {
 					</ul>
 				</nav>
 			</aside>
-			
+
 			<main className="flex-1 overflow-auto">
 				<Outlet />
 			</main>

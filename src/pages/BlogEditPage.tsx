@@ -7,6 +7,7 @@ import { useBlog, useUpdateBlog } from "@/hooks/useBlogs";
 import { useTags } from "@/hooks/useTags";
 import type { TipTapJSON } from "@/services/api/types";
 import { sanitizeRichText, sanitizeText } from "@/utils/sanitizeInput";
+import { handleImageUpload, getImageUrl } from "@/utils/imageUpload";
 
 const BlogEditPage = () => {
 	const navigate = useNavigate();
@@ -33,6 +34,7 @@ const BlogEditPage = () => {
 	});
 
 	const [imagePreview, setImagePreview] = useState<string>("");
+	const [isUploadingImage, setIsUploadingImage] = useState(false);
 	const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const hasLoadedFromCacheRef = useRef(false);
 
@@ -68,7 +70,16 @@ const BlogEditPage = () => {
 				time_read: blog.time_read || "",
 				tag_id: blog.tag_id,
 			});
-			setImagePreview(blog.thumbnail || "");
+
+			// If thumbnail is an S3 key, fetch the presigned URL for preview
+			if (blog.thumbnail) {
+				getImageUrl(blog.thumbnail)
+					.then((url) => setImagePreview(url))
+					.catch((error) => {
+						console.error("Failed to load thumbnail preview:", error);
+						setImagePreview("");
+					});
+			}
 		}
 	}, [blog]);
 
@@ -139,33 +150,31 @@ const BlogEditPage = () => {
 		setFormData((prev) => ({ ...prev, tag_id: tagIds[0] || 0 }));
 	};
 
-	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
-		// Validate file type
 		if (!file.type.startsWith("image/")) {
 			alert("Please select a valid image file");
 			return;
 		}
 
-		// Validate file size (max 5MB)
-		if (file.size > 5 * 1024 * 1024) {
-			alert("Image size should be less than 5MB");
+		if (file.size > 10 * 1024 * 1024) {
+			alert("Image size should be less than 10MB");
 			return;
 		}
 
-		// Convert to base64
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			const base64String = reader.result as string;
-			setFormData((prev) => ({ ...prev, thumbnail: base64String }));
-			setImagePreview(base64String);
-		};
-		reader.onerror = () => {
-			alert("Failed to read image file");
-		};
-		reader.readAsDataURL(file);
+		setIsUploadingImage(true);
+		try {
+			// Upload to S3 and get the key and preview URL
+			const { key, previewUrl } = await handleImageUpload(file);
+			setFormData((prev) => ({ ...prev, thumbnail: key }));
+			setImagePreview(previewUrl);
+		} catch (error) {
+			alert(error instanceof Error ? error.message : "Failed to upload image");
+		} finally {
+			setIsUploadingImage(false);
+		}
 	};
 
 	const validateForm = () => {
@@ -350,9 +359,13 @@ const BlogEditPage = () => {
 								type="file"
 								accept="image/*"
 								onChange={handleImageChange}
+								disabled={isUploadingImage}
 								className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
 							/>
-							{imagePreview && (
+							{isUploadingImage && (
+								<p className="text-sm text-blue-600 mt-2">Uploading image...</p>
+							)}
+							{imagePreview && !isUploadingImage && (
 								<div className="mt-4">
 									<p className="text-sm text-gray-600 mb-2">Preview:</p>
 									<img

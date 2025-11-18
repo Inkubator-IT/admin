@@ -7,6 +7,7 @@ import { useCreateBlog } from "@/hooks/useBlogs";
 import { useTags } from "@/hooks/useTags";
 import type { TipTapJSON } from "@/services/api";
 import { sanitizeRichText, sanitizeText } from "@/utils/sanitizeInput";
+import { handleImageUpload } from "@/utils/imageUpload";
 
 const BlogCreatePage = () => {
 	const navigate = useNavigate();
@@ -30,6 +31,7 @@ const BlogCreatePage = () => {
 	});
 
 	const [imagePreview, setImagePreview] = useState<string>("");
+	const [isUploadingImage, setIsUploadingImage] = useState(false);
 
 	// Generate slug from title
 	const generateSlug = (title: string) => {
@@ -57,7 +59,7 @@ const BlogCreatePage = () => {
 		setFormData((prev) => ({ ...prev, tag_id: tagIds[0] || 0 }));
 	};
 
-	const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
 
@@ -66,21 +68,22 @@ const BlogCreatePage = () => {
 			return;
 		}
 
-		if (file.size > 5 * 1024 * 1024) {
-			alert("Image size should be less than 5MB");
+		if (file.size > 10 * 1024 * 1024) {
+			alert("Image size should be less than 10MB");
 			return;
 		}
 
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			const base64String = reader.result as string;
-			setFormData((prev) => ({ ...prev, thumbnail: base64String }));
-			setImagePreview(base64String);
-		};
-		reader.onerror = () => {
-			alert("Failed to read image file");
-		};
-		reader.readAsDataURL(file);
+		setIsUploadingImage(true);
+		try {
+			// Upload to S3 and get the key and preview URL
+			const { key, previewUrl } = await handleImageUpload(file);
+			setFormData((prev) => ({ ...prev, thumbnail: key }));
+			setImagePreview(previewUrl);
+		} catch (error) {
+			alert(error instanceof Error ? error.message : "Failed to upload image");
+		} finally {
+			setIsUploadingImage(false);
+		}
 	};
 
 	const validateForm = () => {
@@ -249,9 +252,13 @@ const BlogCreatePage = () => {
 							type="file"
 							accept="image/*"
 							onChange={handleImageChange}
+							disabled={isUploadingImage}
 							className="w-full px-3 py-2 border border-gray-300"
 						/>
-						{imagePreview && (
+						{isUploadingImage && (
+							<p className="text-sm text-blue-600 mt-2">Uploading image...</p>
+						)}
+						{imagePreview && !isUploadingImage && (
 							<div className="mt-4">
 								<p className="text-sm text-gray-600 mb-2">Preview</p>
 								<img
