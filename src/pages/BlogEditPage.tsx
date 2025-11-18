@@ -7,7 +7,7 @@ import { useBlog, useUpdateBlog } from "@/hooks/useBlogs";
 import { useTags } from "@/hooks/useTags";
 import type { TipTapJSON } from "@/services/api/types";
 import { sanitizeRichText, sanitizeText } from "@/utils/sanitizeInput";
-import { handleImageUpload, getImageUrl } from "@/utils/imageUpload";
+import { handleImageUpload } from "@/utils/imageUpload";
 
 const BlogEditPage = () => {
 	const navigate = useNavigate();
@@ -71,15 +71,7 @@ const BlogEditPage = () => {
 				tag_id: blog.tag_id,
 			});
 
-			// If thumbnail is an S3 key, fetch the presigned URL for preview
-			if (blog.thumbnail) {
-				getImageUrl(blog.thumbnail)
-					.then((url) => setImagePreview(url))
-					.catch((error) => {
-						console.error("Failed to load thumbnail preview:", error);
-						setImagePreview("");
-					});
-			}
+			setImagePreview(blog.thumbnail || "");
 		}
 	}, [blog]);
 
@@ -166,10 +158,10 @@ const BlogEditPage = () => {
 
 		setIsUploadingImage(true);
 		try {
-			// Upload to S3 and get the key and preview URL
-			const { key, previewUrl } = await handleImageUpload(file);
-			setFormData((prev) => ({ ...prev, thumbnail: key }));
-			setImagePreview(previewUrl);
+			// Upload image and get the public URL
+			const { url } = await handleImageUpload(file);
+			setFormData((prev) => ({ ...prev, thumbnail: url }));
+			setImagePreview(url);
 		} catch (error) {
 			alert(error instanceof Error ? error.message : "Failed to upload image");
 		} finally {

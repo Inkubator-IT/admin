@@ -66,22 +66,30 @@ export interface Project {
 	title: string;
 	description: string;
 	owner: string;
-	url: string;
-	tag_id: number;
-	tech_stack_id: number;
-	testimonial: string;
+	url?: string;
+	category: string;
+	scope: string;
+	thumbnail?: string;
+	images?: string[];
+	featured: boolean;
+	testimonial?: string;
 	created_at: string;
 	updated_at: string;
+	techStacks?: { tech_stack_id: number }[];
 }
 
 export interface CreateProjectRequest {
 	title: string;
 	description: string;
 	owner: string;
-	url: string;
-	tag_id: number;
-	tech_stack_id: number;
-	testimonial: string;
+	url?: string;
+	category: string;
+	scope: string;
+	thumbnail?: string;
+	images?: string[];
+	featured?: boolean;
+	testimonial?: string;
+	tech_stack_ids?: number[];
 }
 
 export interface UpdateProjectRequest extends Partial<CreateProjectRequest> {}
@@ -107,6 +115,7 @@ export interface TechStack {
 	tech_stack_id: number;
 	tech_stack_name: string;
 	tech_stack_description: string;
+	icon_url?: string;
 	created_at: string;
 	updated_at: string;
 }
@@ -114,6 +123,7 @@ export interface TechStack {
 export interface CreateTechStackRequest {
 	tech_stack_name: string;
 	tech_stack_description: string;
+	icon_url?: string;
 }
 
 export interface UpdateTechStackRequest
