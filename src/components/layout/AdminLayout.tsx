@@ -1,7 +1,20 @@
-import { Outlet, NavLink } from "react-router-dom";
-import { FileText, Tag, Settings, Briefcase, Layers } from "lucide-react";
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { FileText, Tag, Settings, LogOut, User, Briefcase, Layers } from "lucide-react";
+import { signOut } from "@/lib/auth-client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AdminLayout = () => {
+	const navigate = useNavigate();
+	const { user } = useAuth();
+
+	const handleLogout = async () => {
+		await signOut();
+		navigate("/login");
+	};
+
+	const userName = user?.name || user?.email || "Admin";
+	const userEmail = user?.email || "";
+
 	return (
 		<div className="h-screen bg-gray-50 flex">
 			<aside className="w-64 bg-white shadow-sm border-r h-screen flex flex-col">
@@ -94,6 +107,26 @@ const AdminLayout = () => {
 						</li>
 					</ul>
 				</nav>
+
+				<div className="px-4 pb-4 border-t pt-4">
+					<div className="flex items-center gap-3 px-3 py-2 mb-2">
+						<User className="w-4 h-4 text-gray-600" />
+						<div className="flex-1 min-w-0">
+							<p className="text-sm font-medium text-gray-900 truncate">
+								{userName}
+							</p>
+							<p className="text-xs text-gray-500 truncate">{userEmail}</p>
+						</div>
+					</div>
+					<button
+						type="button"
+						onClick={handleLogout}
+						className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 w-full transition-colors"
+					>
+						<LogOut className="w-4 h-4" />
+						Logout
+					</button>
+				</div>
 			</aside>
 
 			<main className="flex-1 overflow-auto">
