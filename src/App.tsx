@@ -11,13 +11,27 @@ import {
 	TechStackListPage,
 	TechStackCreatePage,
 	TechStackEditPage,
+	LoginPage,
+	RegisterPage,
+
 } from "@/pages";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path="/" element={<AdminLayout />}>
+				<Route path="/login" element={<LoginPage />} />
+				<Route path="/register" element={<RegisterPage />} />
+
+				<Route
+					path="/"
+					element={
+						<ProtectedRoute>
+							<AdminLayout />
+						</ProtectedRoute>
+					}
+				>
 					<Route index element={<BlogListPage />} />
 					<Route path="blogs" element={<BlogListPage />} />
 					<Route path="blogs/create" element={<BlogCreatePage />} />
