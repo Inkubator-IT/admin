@@ -19,7 +19,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { data, isPending } = useSession();
 
 	return (
-		<AuthContext.Provider value={{ user: data?.user ?? null, isLoading: isPending }}>
+		<AuthContext.Provider
+			value={{ user: data?.user ?? null, isLoading: isPending }}
+		>
 			{children}
 		</AuthContext.Provider>
 	);
