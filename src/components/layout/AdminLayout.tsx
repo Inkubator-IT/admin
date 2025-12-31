@@ -1,5 +1,13 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { FileText, Tag, Settings, LogOut, User, Briefcase, Layers } from "lucide-react";
+import {
+	FileText,
+	Tag,
+	Settings,
+	LogOut,
+	User,
+	Briefcase,
+	Layers,
+} from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 import { useAuth } from "@/contexts/AuthContext";
 

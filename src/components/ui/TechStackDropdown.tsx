@@ -112,9 +112,7 @@ const TechStackDropdown = ({
 						techStacks.map((techStack) => (
 							<div
 								key={techStack.tech_stack_id}
-								onClick={() =>
-									handleTechStackToggle(techStack.tech_stack_id)
-								}
+								onClick={() => handleTechStackToggle(techStack.tech_stack_id)}
 								className="flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer"
 							>
 								<div className="flex items-center gap-2">
@@ -142,4 +140,3 @@ const TechStackDropdown = ({
 };
 
 export default TechStackDropdown;
-

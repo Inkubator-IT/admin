@@ -19,10 +19,8 @@ const ProjectEditPage = () => {
 		error: projectError,
 	} = useProject(projectId);
 	const updateProjectMutation = useUpdateProject();
-	const {
-		data: techStacks = [],
-		isLoading: techStacksLoading,
-	} = useTechStacks();
+	const { data: techStacks = [], isLoading: techStacksLoading } =
+		useTechStacks();
 
 	const [formData, setFormData] = useState({
 		title: "",

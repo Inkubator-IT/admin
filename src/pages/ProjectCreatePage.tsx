@@ -11,10 +11,8 @@ import { handleImageUpload } from "@/utils/imageUpload";
 const ProjectCreatePage = () => {
 	const navigate = useNavigate();
 	const createProjectMutation = useCreateProject();
-	const {
-		data: techStacks = [],
-		isLoading: techStacksLoading,
-	} = useTechStacks();
+	const { data: techStacks = [], isLoading: techStacksLoading } =
+		useTechStacks();
 
 	const [formData, setFormData] = useState({
 		title: "",
@@ -370,7 +368,9 @@ const ProjectCreatePage = () => {
 							Tech Stack
 						</label>
 						{techStacksLoading ? (
-							<div className="text-sm text-gray-500">Loading tech stacks...</div>
+							<div className="text-sm text-gray-500">
+								Loading tech stacks...
+							</div>
 						) : (
 							<TechStackDropdown
 								techStacks={techStacks}
