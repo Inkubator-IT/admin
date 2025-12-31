@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { X } from "lucide-react";
 import MetaTags from "@/components/MetaTags";
+import TechStackDropdown from "@/components/ui/TechStackDropdown";
 import { useProject, useUpdateProject } from "@/hooks/useProjects";
+import { useTechStacks } from "@/hooks/useTechStack";
 import { sanitizeText } from "@/utils/sanitizeInput";
 import { handleImageUpload } from "@/utils/imageUpload";
 
@@ -17,6 +19,10 @@ const ProjectEditPage = () => {
 		error: projectError,
 	} = useProject(projectId);
 	const updateProjectMutation = useUpdateProject();
+	const {
+		data: techStacks = [],
+		isLoading: techStacksLoading,
+	} = useTechStacks();
 
 	const [formData, setFormData] = useState({
 		title: "",
@@ -414,26 +420,22 @@ const ProjectEditPage = () => {
 
 						<div>
 							<label className="block text-sm font-medium text-gray-700 mb-2">
-								Tech Stack IDs (comma-separated)
+								Tech Stack
 							</label>
-							<input
-								type="text"
-								value={formData.tech_stack_ids.join(", ")}
-								onChange={(e) =>
-									setFormData((prev) => ({
-										...prev,
-										tech_stack_ids: e.target.value
-											.split(",")
-											.map((id) => parseInt(id.trim()))
-											.filter((id) => !isNaN(id)),
-									}))
-								}
-								placeholder="1, 2, 3"
-								className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
-							/>
-							<p className="text-xs text-gray-500 mt-1">
-								Enter tech stack IDs separated by commas
-							</p>
+							{techStacksLoading ? (
+								<div className="text-sm text-gray-500">
+									Loading tech stacks...
+								</div>
+							) : (
+								<TechStackDropdown
+									techStacks={techStacks}
+									selectedTechStackIds={formData.tech_stack_ids}
+									onTechStackChange={(ids) =>
+										setFormData((prev) => ({ ...prev, tech_stack_ids: ids }))
+									}
+									placeholder="Select tech stacks..."
+								/>
+							)}
 						</div>
 
 						<div className="flex justify-end gap-4 pt-6">
