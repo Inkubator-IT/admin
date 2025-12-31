@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { signIn } from "@/lib/auth-client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
