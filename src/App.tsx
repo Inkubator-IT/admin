@@ -12,8 +12,7 @@ import {
 	TechStackCreatePage,
 	TechStackEditPage,
 	LoginPage,
-	RegisterPage,
-
+	// RegisterPage, // Keep this commented out if you aren't using it yet
 } from "@/pages";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
@@ -22,7 +21,7 @@ function App() {
 		<Router>
 			<Routes>
 				<Route path="/login" element={<LoginPage />} />
-				<Route path="/register" element={<RegisterPage />} />
+				{/* <Route path="/register" element={<RegisterPage />} /> */}
 
 				<Route
 					path="/"

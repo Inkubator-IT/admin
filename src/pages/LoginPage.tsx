@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { signIn } from "@/lib/auth-client";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -94,12 +94,15 @@ export default function LoginPage() {
 							{isLoading ? "Signing in..." : "Sign In"}
 						</Button>
 
-						<p className="text-center text-sm text-gray-600">
+						{/* <p className="text-center text-sm text-gray-600">
 							Don't have an account?{" "}
-							<Link to="/register" className="text-purple-600 hover:underline font-medium">
+							<Link
+								to="/register"
+								className="text-purple-600 hover:underline font-medium"
+							>
 								Register here
 							</Link>
-						</p>
+						</p> */}
 					</form>
 				</CardContent>
 			</Card>
