@@ -110,22 +110,50 @@ const ProjectCreatePage = () => {
 			alert("Please enter a project title");
 			return false;
 		}
+		if (formData.title.length > 100) {
+			alert("Project title cannot exceed 100 characters");
+			return false;
+		}
+
 		if (!formData.description.trim()) {
 			alert("Please enter a project description");
 			return false;
 		}
+		
+		if (formData.description.length > 2000) { 
+			alert("Description is too long (max 2000 characters)");
+			return false;
+		}
+
 		if (!formData.owner.trim()) {
 			alert("Please enter the project owner");
 			return false;
 		}
-		if (!formData.category.trim()) {
+		if (formData.owner.length > 50) {
+			alert("Owner name cannot exceed 50 characters");
+			return false;
+		}
+
+		if (formData.category.trim() === "") {
 			alert("Please select a category");
 			return false;
 		}
-		if (!formData.scope.trim()) {
+		
+		if (formData.scope.trim() === "") {
 			alert("Please select a scope");
 			return false;
 		}
+
+		if (formData.url && formData.url.length > 255) {
+			alert("Project URL is too long (max 255 characters)");
+			return false;
+		}
+
+		if (formData.testimonial && formData.testimonial.length > 500) {
+			alert("Testimonial cannot exceed 500 characters");
+			return false;
+		}
+
 		return true;
 	};
 
