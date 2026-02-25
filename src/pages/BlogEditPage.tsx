@@ -174,14 +174,34 @@ const BlogEditPage = () => {
 			alert("Please enter a blog title");
 			return false;
 		}
+		if (formData.title.length > 150) {
+			alert("Blog title cannot exceed 150 characters");
+			return false;
+		}
+
 		if (!formData.author.trim()) {
 			alert("Please enter the author name");
 			return false;
 		}
+		if (formData.author.length > 50) {
+			alert("Author name cannot exceed 50 characters");
+			return false;
+		}
+
+		if (formData.excerpt && formData.excerpt.length > 300) {
+			alert("Excerpt cannot exceed 300 characters");
+			return false;
+		}
+
 		if (!formData.time_read.trim()) {
 			alert("Please enter the reading time");
 			return false;
 		}
+		if (formData.time_read.length > 50) {
+			alert("Reading time cannot exceed 50 characters");
+			return false;
+		}
+
 		if (
 			!formData.content ||
 			!formData.content.content ||
@@ -190,10 +210,12 @@ const BlogEditPage = () => {
 			alert("Please add content to your blog");
 			return false;
 		}
+
 		if (!formData.tag_id) {
 			alert("Please select a tag");
 			return false;
 		}
+
 		return true;
 	};
 

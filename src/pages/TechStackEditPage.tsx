@@ -83,6 +83,26 @@ const TechStackEditPage = () => {
 			alert("Please enter a tech stack name");
 			return false;
 		}
+		if (formData.tech_stack_name.length > 50) {
+			alert("Tech stack name cannot exceed 50 characters");
+			return false;
+		}
+
+		if (
+			formData.tech_stack_description &&
+			formData.tech_stack_description.length > 500
+		) {
+			alert("Description cannot exceed 500 characters");
+			return false;
+		}
+
+		// Icon is optional in edit (might be already there), but if cleared it might be an issue?
+		// The state `icon_url` holds the current URL.
+		if (!formData.icon_url) {
+			alert("Please upload an icon");
+			return false;
+		}
+
 		return true;
 	};
 
