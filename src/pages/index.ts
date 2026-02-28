@@ -8,5 +8,8 @@ export { default as ProjectEditPage } from "./ProjectEditPage";
 export { default as TechStackListPage } from "./TechStackListPage";
 export { default as TechStackCreatePage } from "./TechStackCreatePage";
 export { default as TechStackEditPage } from "./TechStackEditPage";
+export { default as TestimonialListPage } from "./TestimonialListPage";
+export { default as TestimonialCreatePage } from "./TestimonialCreatePage";
+export { default as TestimonialEditPage } from "./TestimonialEditPage";
 export { default as LoginPage } from "./LoginPage";
 // export { default as RegisterPage } from "./RegisterPage";

@@ -7,6 +7,7 @@ import {
 	User,
 	Briefcase,
 	Layers,
+	MessageSquareQuote,
 } from "lucide-react";
 import { signOut } from "@/lib/auth-client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -96,6 +97,21 @@ const AdminLayout = () => {
 							>
 								<Tag className="w-4 h-4" />
 								Tags
+							</NavLink>
+						</li>
+						<li>
+							<NavLink
+								to="/testimonials"
+								className={({ isActive }) =>
+									`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+										isActive
+											? "bg-purple-100 text-purple-700"
+											: "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+									}`
+								}
+							>
+								<MessageSquareQuote className="w-4 h-4" />
+								Testimonials
 							</NavLink>
 						</li>
 						<li>

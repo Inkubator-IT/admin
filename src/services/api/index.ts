@@ -5,6 +5,7 @@ export { projectsApi } from "./projects.service";
 export { servicesApi } from "./services.service";
 export { techStackApi } from "./tech-stack.service";
 export { clientInformationApi } from "./client-information.service";
+export { testimonialsApi } from "./testimonials.service";
 export { StorageService } from "./storage.service";
 
 // Export types
@@ -34,6 +35,10 @@ export type {
 	ClientInformation,
 	CreateClientInformationRequest,
 	UpdateClientInformationRequest,
+	// Testimonial types
+	Testimonial,
+	CreateTestimonialRequest,
+	UpdateTestimonialRequest,
 } from "./types";
 
 // Convenience export for accessing all APIs through a single object
@@ -43,6 +48,7 @@ import { projectsApi } from "./projects.service";
 import { servicesApi } from "./services.service";
 import { techStackApi } from "./tech-stack.service";
 import { clientInformationApi } from "./client-information.service";
+import { testimonialsApi } from "./testimonials.service";
 import { StorageService } from "./storage.service";
 
 export const api = {
@@ -52,5 +58,6 @@ export const api = {
 	services: servicesApi,
 	techStack: techStackApi,
 	clientInformation: clientInformationApi,
+	testimonials: testimonialsApi,
 	storage: StorageService,
 };

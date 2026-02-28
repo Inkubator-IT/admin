@@ -25,6 +25,19 @@ export default function LoginPage() {
 		setError("");
 		setIsLoading(true);
 
+		// TODO: REMOVE THIS BYPASS WHEN BACKEND AUTH IS IMPLEMENTED
+		// Currently backend has no auth/users table, so we bypass login for development.
+		setTimeout(() => {
+			console.warn("BYPASSING LOGIN: No backend auth available yet.");
+			// Mock successful login state
+			localStorage.setItem("admin_token", "dev_token");
+			// Force reload to update AuthContext
+			window.location.href = "/";
+			setIsLoading(false);admin/src/contexts
+		}, 1000);
+
+		// ORIGINAL CODE (Commented out):
+		/*
 		try {
 			const result = await signIn.email({
 				email,
@@ -42,6 +55,7 @@ export default function LoginPage() {
 		} finally {
 			setIsLoading(false);
 		}
+		*/
 	};
 
 	return (

@@ -173,3 +173,23 @@ export interface CreateClientInformationRequest {
 
 export interface UpdateClientInformationRequest
 	extends Partial<CreateClientInformationRequest> {}
+
+// Testimonial Types
+export interface Testimonial {
+	id: number;
+	full_name: string;
+	role: string;
+	description: string;
+	created_at: string;
+	updated_at: string;
+}
+
+export interface CreateTestimonialRequest {
+	full_name: string;
+	role: string;
+	description: string;
+}
+
+export interface UpdateTestimonialRequest
+	extends Partial<CreateTestimonialRequest> {}
+
