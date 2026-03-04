@@ -7,6 +7,7 @@ import { projectsApi } from "./api/projects.service";
 import { servicesApi } from "./api/services.service";
 import { techStackApi } from "./api/tech-stack.service";
 import { clientInformationApi } from "./api/client-information.service";
+import { testimonialsApi } from "./api/testimonials.service";
 
 export const apiService = {
 	// Blog methods
@@ -56,4 +57,11 @@ export const apiService = {
 		clientInformationApi.updateClientInformation.bind(clientInformationApi),
 	deleteClientInformation:
 		clientInformationApi.deleteClientInformation.bind(clientInformationApi),
+
+	// Testimonial methods
+	getAllTestimonials: testimonialsApi.getAllTestimonials.bind(testimonialsApi),
+	getTestimonialById: testimonialsApi.getTestimonialById.bind(testimonialsApi),
+	createTestimonial: testimonialsApi.createTestimonial.bind(testimonialsApi),
+	updateTestimonial: testimonialsApi.updateTestimonial.bind(testimonialsApi),
+	deleteTestimonial: testimonialsApi.deleteTestimonial.bind(testimonialsApi),
 };

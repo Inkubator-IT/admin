@@ -49,6 +49,24 @@ const TechStackCreatePage = () => {
 			alert("Please enter a tech stack name");
 			return false;
 		}
+		if (formData.tech_stack_name.length > 50) {
+			alert("Tech stack name cannot exceed 50 characters");
+			return false;
+		}
+
+		if (
+			formData.tech_stack_description &&
+			formData.tech_stack_description.length > 500
+		) {
+			alert("Description cannot exceed 500 characters");
+			return false;
+		}
+
+		if (!formData.icon_url) {
+			alert("Please upload an icon");
+			return false;
+		}
+
 		return true;
 	};
 
